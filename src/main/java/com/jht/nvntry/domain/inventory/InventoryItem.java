@@ -21,6 +21,9 @@ public class InventoryItem {
     @Column(name = "product_id", nullable = false)
     private UUID productId;
 
+    @Column(name = "location_id", nullable = false)
+    private UUID locationId;
+
     @Column(nullable = false, columnDefinition = "INT CHECK (quantity >= 0)")
     private long quantity;
 
@@ -39,12 +42,14 @@ public class InventoryItem {
 
     public InventoryItem(
             UUID productId,
+            UUID locationId,
             long quantity,
             Instant createdAt,
             Instant updatedAt
     ) {
         this.id = UUID.randomUUID();
         this.productId = productId;
+        this.locationId = locationId;
         this.quantity = quantity;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

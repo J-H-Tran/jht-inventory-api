@@ -27,6 +27,9 @@ public class Reservation {
     @Column(name = "product_id", nullable = false)
     private UUID productId;
 
+    @Column(name = "location_id", nullable = false)
+    private UUID locationId;
+
     @Column(nullable = false, columnDefinition = "INT CHECK (quantity > 0)")
     private long quantity;
 
@@ -52,6 +55,7 @@ public class Reservation {
 
     public Reservation(
             UUID productId,
+            UUID locationId,
             long quantity,
             Status status,
             long version,
@@ -61,6 +65,7 @@ public class Reservation {
     ) {
         this.id = UUID.randomUUID();
         this.productId = productId;
+        this.locationId = locationId;
         this.quantity = quantity;
         this.status = status;
         this.version = 0;
