@@ -16,3 +16,5 @@ spring:
   docker:
     compose:
       enabled: false
+  jackson:
+    property-naming-strategy: SNAKE_CASE
