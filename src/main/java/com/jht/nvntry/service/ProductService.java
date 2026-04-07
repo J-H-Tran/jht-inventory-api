@@ -1,5 +1,6 @@
 package com.jht.nvntry.service;
 
+import com.jht.nvntry.domain.inventory.dto.InventoryAvailabilityDTO;
 import com.jht.nvntry.domain.product.dto.ProductCreationDTO;
 import com.jht.nvntry.domain.product.dto.ProductDTO;
 import com.jht.nvntry.domain.product.dto.ProductModificationDTO;
@@ -8,7 +9,7 @@ import java.util.UUID;
 
 public interface ProductService {
     List<ProductDTO> getAllProducts();
-    ProductDTO getProduct(UUID id);
+    ProductDTO getProduct(UUID prodId);
     ProductDTO createProduct(ProductCreationDTO dto);
     ProductDTO updateProduct(UUID id, ProductModificationDTO dto);
 }

@@ -62,8 +62,9 @@ public class ProductServiceImpl implements ProductService {
         Product productMod = mapper.toEntity(dto);
 
         Product product = getExistingProduct(id);
-        product.setSku(productMod.getSku());
-        product.setName(productMod.getName());
+        // Only update if field is provided (not null)
+        if (dto.sku() != null) product.setSku(productMod.getSku());
+        if (dto.name() != null ) product.setName(productMod.getName());
         product.setUpdatedAt(Instant.now(clock));
 
         Product savedProduct = productRepository.save(product);
