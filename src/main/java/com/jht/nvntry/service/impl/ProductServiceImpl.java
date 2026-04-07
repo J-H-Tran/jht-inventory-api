@@ -2,11 +2,15 @@ package com.jht.nvntry.service.impl;
 
 import com.jht.nvntry.api.exception.NotFoundException;
 import com.jht.nvntry.domain.product.Product;
+import com.jht.nvntry.domain.product.dto.ProductCreationDTO;
 import com.jht.nvntry.domain.product.dto.ProductDTO;
+import com.jht.nvntry.domain.product.dto.ProductModificationDTO;
 import com.jht.nvntry.domain.product.mapper.ProductMapper;
 import com.jht.nvntry.repository.ProductRepository;
 import com.jht.nvntry.service.ProductService;
 import org.springframework.stereotype.Service;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,13 +18,16 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper mapper;
+    private final Clock clock;
 
     public ProductServiceImpl (
             ProductRepository productRepository,
-            ProductMapper mapper
+            ProductMapper mapper,
+            Clock clock
     ) {
         this.productRepository = productRepository;
         this.mapper = mapper;
+        this.clock = clock;
     }
 
     @Override
@@ -32,10 +39,39 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO getProductById(UUID productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Product not found: " + productId));
-
+    public ProductDTO getProduct(UUID id) {
+        Product product = getExistingProduct(id);
         return mapper.toDTO(product);
+    }
+
+    @Override
+    public ProductDTO createProduct(ProductCreationDTO dto) {
+        Product p = new Product(
+                dto.sku(),
+                dto.name(),
+                Instant.now(clock),
+                Instant.now(clock)
+        );
+
+        Product savedProduct = productRepository.save(p);
+        return mapper.toDTO(savedProduct);
+    }
+
+    @Override
+    public ProductDTO updateProduct(UUID id, ProductModificationDTO dto) {
+        Product productMod = mapper.toEntity(dto);
+
+        Product product = getExistingProduct(id);
+        product.setSku(productMod.getSku());
+        product.setName(productMod.getName());
+        product.setUpdatedAt(Instant.now(clock));
+
+        Product savedProduct = productRepository.save(product);
+        return mapper.toDTO(savedProduct);
+    }
+
+    private Product getExistingProduct(UUID id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Product not found: " + id));
     }
 }

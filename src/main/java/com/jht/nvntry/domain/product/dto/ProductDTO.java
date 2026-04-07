@@ -4,8 +4,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ProductDTO(
-//        UUID id,
+        UUID id,
         String sku,
         String name,
-        Instant createdAt
+        Instant createdAt,
+        Instant updatedAt
 ) {}

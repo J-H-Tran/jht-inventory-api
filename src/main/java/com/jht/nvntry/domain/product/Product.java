@@ -26,17 +26,22 @@ public class Product {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
     public Product() {
     }
 
     public Product(
             String sku,
             String name,
-            Instant createdAt
+            Instant createdAt,
+            Instant updatedAt
     ) {
         this.id = UUID.randomUUID();
         this.sku = sku;
         this.name = name;
         this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }
