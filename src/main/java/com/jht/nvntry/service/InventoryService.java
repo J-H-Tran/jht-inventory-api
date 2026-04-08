@@ -1,8 +1,9 @@
 package com.jht.nvntry.service;
 
-import com.jht.nvntry.domain.inventory.dto.InventoryAvailabilityDTO;
+import com.jht.nvntry.domain.inventory.dto.ReserveQuantityDTO;
+import com.jht.nvntry.domain.reservation.dto.ReservationDTO;
 import java.util.UUID;
 
 public interface InventoryService {
-    InventoryAvailabilityDTO checkAvailability(UUID prodId, UUID locId);
+    ReservationDTO reserve(UUID prodId, UUID locId, ReserveQuantityDTO dto);
 }
