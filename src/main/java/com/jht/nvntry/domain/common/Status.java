@@ -1,4 +1,4 @@
-package com.jht.nvntry.api.common;
+package com.jht.nvntry.domain.common;
 
 public enum Status {
     ACTIVE,
