@@ -1,5 +1,6 @@
 package com.jht.nvntry.repository;
 
+import com.jht.nvntry.domain.common.Status;
 import com.jht.nvntry.domain.reservation.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,10 +16,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
         FROM Reservation r
         WHERE r.productId = :productId
         AND r.locationId = :locationId
-        AND r.status = 'ACTIVE'
+        AND r.status = :status
     """)
-    long sumActiveReservationsByproductAndLocation(
+    int sumActiveReservationsByproductAndLocation(
             @Param("productId") UUID prodId,
-            @Param("locationId") UUID locId
+            @Param("locationId") UUID locId,
+            @Param("status") Status status
     );
 }
