@@ -1,6 +1,6 @@
 package com.jht.nvntry.domain.inventory;
 
-import com.jht.nvntry.api.common.Reason;
+import com.jht.nvntry.domain.common.Reason;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -30,9 +32,10 @@ public class InventoryMovement {
     private UUID reservationId;
 
     @Column(name = "change_amount", nullable = false)
-    private long changeAmount;
+    private int changeAmount;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(nullable = false)
     private Reason reason;
 
@@ -44,11 +47,13 @@ public class InventoryMovement {
 
     public InventoryMovement(
             UUID productId,
+            UUID locationId,
             UUID reservationId,
-            long changeAmount,
+            int changeAmount,
             Reason reason
     ) {
         this.productId = productId;
+        this.locationId = locationId;
         this.reservationId = reservationId;
         this.changeAmount = changeAmount;
         this.reason = reason;

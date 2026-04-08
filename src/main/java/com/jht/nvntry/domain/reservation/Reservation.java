@@ -1,6 +1,6 @@
 package com.jht.nvntry.domain.reservation;
 
-import com.jht.nvntry.api.common.Status;
+import com.jht.nvntry.domain.common.Status;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,7 +10,11 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Entity
@@ -28,15 +32,16 @@ public class Reservation {
     private UUID locationId;
 
     @Column(nullable = false, columnDefinition = "INT CHECK (quantity > 0)")
-    private long quantity;
+    private int quantity;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(nullable = false)
     private Status status;
 
     @Version
     @Column(nullable = false)
-    private long version;
+    private int version = 0;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
@@ -49,22 +54,22 @@ public class Reservation {
 
     public Reservation() {
     }
-
-    public Reservation(
+    // Replace the messy constructors with a factory method or a single proper one
+    public static Reservation createActive(
             UUID productId,
             UUID locationId,
-            long quantity,
-            Status status,
-            long version,
-            Instant updatedAt,
-            Instant expiresAt
+            int quantity,
+            Clock clock
     ) {
-        this.productId = productId;
-        this.locationId = locationId;
-        this.quantity = quantity;
-        this.status = status;
-        this.version = 0;
-        this.updatedAt = updatedAt;
-        this.expiresAt = expiresAt;
+        Reservation r = new Reservation();
+        r.setProductId(productId);
+        r.setLocationId(locationId);
+        r.setQuantity(quantity);
+        r.setStatus(Status.ACTIVE);
+        Instant now = Instant.now(clock);
+        r.setCreatedAt(now);
+        r.setUpdatedAt(now);
+        r.setExpiresAt(now.plus(15, ChronoUnit.MINUTES)); // make duration configurable
+        return r;
     }
 }

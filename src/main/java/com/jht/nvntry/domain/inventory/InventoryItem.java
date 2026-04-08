@@ -26,11 +26,11 @@ public class InventoryItem {
     private UUID locationId;
 
     @Column(nullable = false, columnDefinition = "INT CHECK (quantity >= 0)")
-    private long quantity;
+    private int quantity;
 
     @Version
     @Column(nullable = false)
-    private long version;
+    private int version;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
@@ -44,7 +44,7 @@ public class InventoryItem {
     public InventoryItem(
             UUID productId,
             UUID locationId,
-            long quantity,
+            int quantity,
             Instant createdAt,
             Instant updatedAt
     ) {

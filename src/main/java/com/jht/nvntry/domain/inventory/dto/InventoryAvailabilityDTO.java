@@ -5,6 +5,6 @@ import java.util.UUID;
 public record InventoryAvailabilityDTO(
         UUID productId,
         UUID locationId,
-        long available, // physically in stock
-        long reserved   // sum of active reservations at this location
+        int available, // physically in stock
+        int reserved   // sum of active reservations at this location
 ) {}
