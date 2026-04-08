@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.time.Instant;
 import java.util.UUID;
 
+@Deprecated
 @Entity
 @Table(name = "inventory_items")
 @Getter
