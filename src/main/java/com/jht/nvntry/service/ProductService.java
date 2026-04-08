@@ -1,6 +1,5 @@
 package com.jht.nvntry.service;
 
-import com.jht.nvntry.domain.inventory.dto.InventoryAvailabilityDTO;
 import com.jht.nvntry.domain.product.dto.ProductCreationDTO;
 import com.jht.nvntry.domain.product.dto.ProductDTO;
 import com.jht.nvntry.domain.product.dto.ProductModificationDTO;

@@ -46,11 +46,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO createProduct(ProductCreationDTO dto) {
-        Product p = new Product(
+        Product p = Product.createActive(
                 dto.sku(),
                 dto.name(),
-                Instant.now(clock),
-                Instant.now(clock)
+                clock
         );
 
         Product savedProduct = productRepository.save(p);
@@ -64,7 +63,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = getExistingProduct(id);
         // Only update if field is provided (not null)
         if (dto.sku() != null) product.setSku(productMod.getSku());
-        if (dto.name() != null ) product.setName(productMod.getName());
+        if (dto.name() != null) product.setName(productMod.getName());
         product.setUpdatedAt(Instant.now(clock));
 
         Product savedProduct = productRepository.save(product);

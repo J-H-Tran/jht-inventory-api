@@ -3,7 +3,7 @@ GET {{baseUrl}}/products
 Accept: application/json
 
 ### Get single product
-GET {{baseUrl}}/products/c503ec2f-c6a7-44bf-a246-bc10f7af05cc
+GET {{baseUrl}}/products/a5555555-5555-5555-5555-555555555555
 Accept: application/json
 
 ### Create single product
@@ -11,17 +11,22 @@ POST {{baseUrl}}/products
 Content-Type: application/json
 
 {
-  "sku": "VTUBER-212",
-  "name": "Koyori"
+  "sku": "VTUBER-111",
+  "name": "Botan"
 }
 
 ### Update single product
-PATCH {{baseUrl}}/products/64bcdaab-0f94-4a82-8751-2ce96854345e
+PATCH {{baseUrl}}/products/948fc070-2e10-4044-95f2-707c672785d8
 Content-Type: application/json
 
 {
-  "name": "Subaru"
+  "name": "Azki"
 }
 
-### Check availability
-GET {{baseUrl}}/products/d4e5f6a7-b8c9-0123-defa-234567890123/inventory?location=11111111-1111-1111-1111-111111111111
+### Reserve
+POST {{baseUrl}}/products/{{checkPID}}/reservations?locationId={{checkLID}}
+Content-Type: application/json
+
+{
+  "quantity": 100
+}
