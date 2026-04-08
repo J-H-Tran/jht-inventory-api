@@ -1,11 +1,13 @@
 package com.jht.nvntry.controller;
 
-import com.jht.nvntry.domain.inventory.dto.InventoryAvailabilityDTO;
+import com.jht.nvntry.domain.inventory.dto.ReserveQuantityDTO;
 import com.jht.nvntry.domain.product.dto.ProductCreationDTO;
 import com.jht.nvntry.domain.product.dto.ProductDTO;
 import com.jht.nvntry.domain.product.dto.ProductModificationDTO;
+import com.jht.nvntry.domain.reservation.dto.ReservationDTO;
 import com.jht.nvntry.service.InventoryService;
 import com.jht.nvntry.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -66,12 +68,12 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(id, dto));
     }
 
-    // check availability
-    @GetMapping("{id}/inventory")
-    public ResponseEntity<InventoryAvailabilityDTO> checkAvailability(
-            @PathVariable("id") UUID prodId,
-            @RequestParam("location") UUID locId
+    @PostMapping("{id}/reservations")
+    public ResponseEntity<ReservationDTO> reserve(
+            @PathVariable("id") UUID productId,
+            @RequestParam("locationId") UUID locationId,
+            @RequestBody @Valid ReserveQuantityDTO dto
     ) {
-        return ResponseEntity.ok(inventoryService.checkAvailability(prodId, locId));
+        return ResponseEntity.ok(inventoryService.reserve(productId, locationId, dto));
     }
 }
