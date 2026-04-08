@@ -5,35 +5,28 @@ import com.jht.nvntry.domain.product.dto.ProductCreationDTO;
 import com.jht.nvntry.domain.product.dto.ProductDTO;
 import com.jht.nvntry.domain.product.dto.ProductModificationDTO;
 import org.springframework.stereotype.Component;
-import java.time.Instant;
-import java.util.UUID;
+import java.time.Clock;
 
 @Component
 public class ProductMapper {
+    private final Clock clock;
+
+    public ProductMapper(Clock clock) {
+        this.clock = clock;
+    }
 
     public ProductDTO toDTO(Product p) {
         if (p == null) return null;
-        UUID id = p.getId();
-        String sku = p.getSku();
-        String name = p.getName();
-        Instant createdAt = p.getCreatedAt();
-        Instant updatedAt = p.getUpdatedAt();
-        return new ProductDTO(id, sku, name, createdAt, updatedAt);
+        return new ProductDTO(p.getId(), p.getSku(), p.getName(), p.getCreatedAt(), p.getUpdatedAt());
     }
 
     public Product toEntity(ProductCreationDTO dto) {
         if (dto == null) return null;
-        Product p = new Product();
-        p.setSku(dto.sku());
-        p.setName(dto.name());
-        return p;
+        return Product.createActive(dto.sku(), dto.name(), clock);
     }
 
     public Product toEntity(ProductModificationDTO dto) {
         if (dto == null) return null;
-        Product p = new Product();
-        p.setSku(dto.sku());
-        p.setName(dto.name());
-        return p;
+        return Product.createActive(dto.sku(), dto.name(), clock);
     }
 }
