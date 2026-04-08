@@ -1,0 +1,11 @@
+package com.jht.nvntry.api.common;
+
+public enum Reason {
+    RECEIPT,
+    RESERVATION_CREATED,
+    RESERVATION_FULFILLED,
+    RESERVATION_CANCELLED,
+    RESERVATION_EXPIRED,
+    MANUAL_ADJUSTMENT,
+    RETURN
+}
