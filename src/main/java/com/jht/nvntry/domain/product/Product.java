@@ -1,7 +1,10 @@
 package com.jht.nvntry.domain.product;
 
+import com.jht.nvntry.api.common.Status;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -15,7 +18,7 @@ import java.util.UUID;
 @Setter
 public class Product {
     @Id
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @Column(nullable = false)
     private String sku;
@@ -23,8 +26,15 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private String category;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status;
+
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
@@ -35,13 +45,10 @@ public class Product {
     public Product(
             String sku,
             String name,
-            Instant createdAt,
             Instant updatedAt
     ) {
-        this.id = UUID.randomUUID();
         this.sku = sku;
         this.name = name;
-        this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 }

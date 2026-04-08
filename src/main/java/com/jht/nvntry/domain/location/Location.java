@@ -15,7 +15,7 @@ import java.util.UUID;
 @Setter
 public class Location {
     @Id
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @Column(nullable = false)
     private String code;
@@ -24,7 +24,7 @@ public class Location {
     private String name;
 
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
@@ -32,11 +32,13 @@ public class Location {
     public Location() {
     }
 
-    public Location(String code, String name, Instant createdAt, Instant updatedAt) {
-        this.id = UUID.randomUUID();
+    public Location(
+            String code,
+            String name,
+            Instant updatedAt
+    ) {
         this.code = code;
         this.name = name;
-        this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 }

@@ -1,5 +1,6 @@
 package com.jht.nvntry.domain.reservation;
 
+import com.jht.nvntry.api.common.Status;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,12 +18,8 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Reservation {
-    public static enum Status {
-        ACTIVE, FULFILLED, CANCELLED, EXPIRED
-    }
-
     @Id
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @Column(name = "product_id", nullable = false)
     private UUID productId;
@@ -42,7 +39,7 @@ public class Reservation {
     private long version;
 
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
@@ -59,17 +56,14 @@ public class Reservation {
             long quantity,
             Status status,
             long version,
-            Instant createdAt,
             Instant updatedAt,
             Instant expiresAt
     ) {
-        this.id = UUID.randomUUID();
         this.productId = productId;
         this.locationId = locationId;
         this.quantity = quantity;
         this.status = status;
         this.version = 0;
-        this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.expiresAt = expiresAt;
     }

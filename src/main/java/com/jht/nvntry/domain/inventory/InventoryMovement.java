@@ -1,7 +1,10 @@
 package com.jht.nvntry.domain.inventory;
 
+import com.jht.nvntry.api.common.Reason;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -15,10 +18,13 @@ import java.util.UUID;
 @Setter
 public class InventoryMovement {
     @Id
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @Column(name = "product_id", nullable = false)
     private UUID productId;
+
+    @Column(name = "location_id", nullable = false)
+    private UUID locationId;
 
     @Column(name = "reservation_id", nullable = true)
     private UUID reservationId;
@@ -26,11 +32,12 @@ public class InventoryMovement {
     @Column(name = "change_amount", nullable = false)
     private long changeAmount;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String reason;
+    private Reason reason;
 
     @Column(nullable = false)
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     public InventoryMovement() {
     }
@@ -39,14 +46,11 @@ public class InventoryMovement {
             UUID productId,
             UUID reservationId,
             long changeAmount,
-            String reason,
-            Instant createdAt
+            Reason reason
     ) {
-        this.id = UUID.randomUUID();
         this.productId = productId;
         this.reservationId = reservationId;
         this.changeAmount = changeAmount;
         this.reason = reason;
-        this.createdAt = createdAt;
     }
 }
