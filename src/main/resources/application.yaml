@@ -16,5 +16,6 @@ spring:
   docker:
     compose:
       enabled: false
+  # Configuration for response fields naming convention
   jackson:
     property-naming-strategy: SNAKE_CASE
