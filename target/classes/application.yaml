@@ -1,0 +1,65 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  api-docs:
+    path: /v1/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: nvntry
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/inventory_db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10 # revisit in Week 5 with evidence
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 300000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate # Flyway owns the schema - Hibernate only validates
+    show-sql: false # use query logging below instead
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+    #baseline-version: 0
+
+#  docker:
+#    compose:
+#      enabled: false
+
+  # Configuration for response fields naming convention
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+logging:
+  level:
+    root: INFO
+    com.example.inventory: DEBUG
+    org.hibernate.SQL: DEBUG # shows actual SQL in dev
+    org.hibernate.orm.jdbc.bind: TRACE # shows bound parameters
+  pattern:
+    console: "%d{yyy-MM-dd HH:mm:ss} [%thread] [%X{tradeId}] %-5level %logger{36} - %msg%n"
