@@ -1,0 +1,27 @@
+### Actuator Health
+GET {{baseUrl}}/actuator/health
+
+### List all active products
+GET {{baseUrl}}/v1/products
+Accept: application/json
+
+### Create single product
+POST {{baseUrl}}/v1/products
+Content-Type: application/json
+
+{
+  "sku": "VTUBER-111",
+  "name": "Botan",
+  "unit_of_measure": "EACH"
+}
+
+### Update single product
+PATCH {{baseUrl}}/v1/products/ef2e7b05-eef0-47db-a376-22a3c99756ee/name
+Content-Type: application/json
+
+{
+  "name": "Azki"
+}
+
+### Deactivate single product
+DELETE {{baseUrl}}/v1/products/ef2e7b05-eef0-47db-a376-22a3c99756ee
