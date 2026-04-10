@@ -21,7 +21,7 @@ spring:
     name: nvntry
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/inventory_db
+    url: jdbc:postgresql://localhost:5433/inventory
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
@@ -44,8 +44,8 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
-    baseline-on-migrate: false
-    #baseline-version: 0
+    baseline-on-migrate: true
+    baseline-version: 0
 
 #  docker:
 #    compose:
