@@ -38,6 +38,21 @@ public class CatalogController {
         return catalogService.listActive(pageable);
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get product details using id")
+    public ResponseEntity<ProductResponse> getProductById(
+            @PathVariable("id") UUID id
+    ) {
+        return ResponseEntity.ok().body(catalogService.getById(id));
+    }
+
+    @GetMapping("/sku/{sku}")
+    public ResponseEntity<ProductResponse> getProductBySku(
+            @PathVariable("sku") String sku
+    ) {
+        return ResponseEntity.ok().body(catalogService.getBySku(sku));
+    }
+
     @PostMapping
     @Operation(summary = "Register a new product")
     public ResponseEntity<ProductResponse> create(

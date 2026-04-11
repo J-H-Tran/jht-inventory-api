@@ -5,6 +5,14 @@ GET {{baseUrl}}/actuator/health
 GET {{baseUrl}}/v1/products?page=0&size=20&sort=createdAt
 Accept: application/json
 
+### Get by product id
+GET {{baseUrl}}/v1/products/ef2e7b05-eef0-47db-a376-22a3c99756ee
+Accept: application/json
+
+### Get by product sku
+GET {{baseUrl}}/v1/products/sku/VTUBER-112
+Accept: application/json
+
 ### Create single product
 POST {{baseUrl}}/v1/products
 Content-Type: application/json
