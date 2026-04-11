@@ -2,7 +2,7 @@
 GET {{baseUrl}}/actuator/health
 
 ### List all active products
-GET {{baseUrl}}/v1/products
+GET {{baseUrl}}/v1/products?page=0&size=20&sort=createdAt
 Accept: application/json
 
 ### Create single product
@@ -10,18 +10,18 @@ POST {{baseUrl}}/v1/products
 Content-Type: application/json
 
 {
-  "sku": "VTUBER-111",
+  "sku": "VTUBER-112",
   "name": "Botan",
   "unit_of_measure": "EACH"
 }
 
 ### Update single product
-PATCH {{baseUrl}}/v1/products/ef2e7b05-eef0-47db-a376-22a3c99756ee/name
+PATCH {{baseUrl}}/v1/products/9f39b18a-322f-45a2-8a6a-29f7efbbd70e/name
 Content-Type: application/json
 
 {
-  "name": "Azki"
+  "name": "Koyori"
 }
 
 ### Deactivate single product
-DELETE {{baseUrl}}/v1/products/ef2e7b05-eef0-47db-a376-22a3c99756ee
+DELETE {{baseUrl}}/v1/products/9f39b18a-322f-45a2-8a6a-29f7efbbd70e
