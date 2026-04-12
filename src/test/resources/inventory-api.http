@@ -1,3 +1,6 @@
+### Actuator Health
+GET {{baseUrl}}/actuator/health
+
 ### Get All Products
 GET {{baseUrl}}/products
 Accept: application/json
