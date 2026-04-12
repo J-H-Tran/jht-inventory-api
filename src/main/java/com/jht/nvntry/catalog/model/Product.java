@@ -39,7 +39,7 @@ public class Product {
     private UnitOfMeasure unitOfMeasure;
 
     @Column(nullable = false)
-    @Setter // set false for soft delete
+    @Setter // Set false: business meaning -> soft delete
     private boolean active;
 
     @Column(name = "created_at", nullable = false, updatable = false)
