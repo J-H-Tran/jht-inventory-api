@@ -14,30 +14,32 @@ jobs:
         image: postgres:17-alpine
         env:
           POSTGRES_DB: inventory
-          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_USER: inventory_user
+          POSTGRES_PASSWORD: inventory_pass
         ports:
           - 5433:5432
         options: >-
-          -health-cmd  pg_isready -U ${{ secrets.DB_USERNAME }} -d inventory
-          -health-interval 10s
-          -health-timeout 5s
-          -health-retries 5
+          --health-cmd="pg_isready -U inventory_user -d inventory"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 25
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '25'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
 
       - name: Build with Maven Wrapper
         env:
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_USERNAME: inventory_user
+          DB_PASSWORD: inventory_pass
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5433/inventory
-        run: ./mvnw -B verify
+        run: |
+          chmod +x ./mvnw
+          ./mvnw -B verify
