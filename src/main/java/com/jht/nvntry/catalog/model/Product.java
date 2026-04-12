@@ -30,7 +30,7 @@ public class Product {
     @Column(nullable = false, unique = true, length = 100)
     private String sku;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     @Setter
     private String name;
 
