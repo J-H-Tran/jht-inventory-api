@@ -1,16 +1,16 @@
 ### Actuator Health
 GET {{baseUrl}}/actuator/health
 
-### List all active products
-GET {{baseUrl}}/v1/products?page=0&size=20&sort=createdAt
-Accept: application/json
-
 ### Get by product id
 GET {{baseUrl}}/v1/products/ef2e7b05-eef0-47db-a376-22a3c99756ee
 Accept: application/json
 
 ### Get by product sku
 GET {{baseUrl}}/v1/products/sku/VTUBER-112
+Accept: application/json
+
+### List all active products
+GET {{baseUrl}}/v1/products?page=0&size=20&sort=createdAt
 Accept: application/json
 
 ### Create single product
@@ -24,11 +24,11 @@ Content-Type: application/json
 }
 
 ### Update single product
-PATCH {{baseUrl}}/v1/products/9f39b18a-322f-45a2-8a6a-29f7efbbd70e/name
+PATCH {{baseUrl}}/v1/products/a1b2c3d4-e5f6-7890-abcd-ef1234567890/name
 Content-Type: application/json
 
 {
-  "name": "Koyori"
+  "name": "Business Laptop Pro 15 inch"
 }
 
 ### Deactivate single product

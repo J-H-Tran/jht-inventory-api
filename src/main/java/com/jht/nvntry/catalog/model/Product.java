@@ -48,7 +48,6 @@ public class Product {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-
     /* Factory Pattern
      * No public constructor, creation goes through here so invariants are
      * enforced at the object level, not scattered across service code.

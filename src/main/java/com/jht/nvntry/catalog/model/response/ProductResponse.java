@@ -1,11 +1,13 @@
-package com.jht.nvntry.catalog.model;
+package com.jht.nvntry.catalog.model.response;
 
+import com.jht.nvntry.catalog.model.Product;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Schema(description = "Product details")
 public record ProductResponse(
+
         @Schema(description = "Unique product ID")
         UUID id,
 
