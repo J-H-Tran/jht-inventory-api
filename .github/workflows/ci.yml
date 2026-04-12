@@ -40,4 +40,6 @@ jobs:
           DB_USERNAME: inventory_user
           DB_PASSWORD: inventory_pass
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5433/inventory
-        run: ./mvnw -B verify
+        run: |
+          chmod +x ./mvnw
+          ./mvnw -B verify
