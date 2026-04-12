@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [master, develop, feature/**, release/**, test/**]
+  pull_request:
+    branches: [master, develop, feature/**, release/**]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: inventory
+          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+          - 5433:5432
+        options: >-
+          -health-cmd  pg_isready -U ${{ secrets.DB_USERNAME }} -d inventory
+          -health-interval 10s
+          -health-timeout 5s
+          -health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven Wrapper
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5433/inventory
+        run: ./mvnw -B verify
