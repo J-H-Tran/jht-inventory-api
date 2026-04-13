@@ -1,12 +1,13 @@
 name: CI
 
 on:
+  pull_request:
+    branches: [master, develop]
   push:
     branches: [master]
-  pull_request:
-    branches: [master, develop, feature/**, release/**]
 jobs:
   test:
+    name: Verify
     runs-on: ubuntu-latest
 
     services:
