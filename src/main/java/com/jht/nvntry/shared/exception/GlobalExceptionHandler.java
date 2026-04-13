@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -41,7 +42,7 @@ public class GlobalExceptionHandler {
     }
 
     /* 422
-    * InsufficientStock os not a 400 (request was valid) nor a 409 (no resource conflict).
+    * InsufficientStock is not a 400 (request was valid) nor a 409 (no resource conflict).
     * Is it a business rule violation on otherwise valid input - hence 422 Unprocessable.
     * */
     @ExceptionHandler(InsufficientStockException.class)
@@ -49,18 +50,33 @@ public class GlobalExceptionHandler {
         return problem(HttpStatus.UNPROCESSABLE_ENTITY, "/errors/insufficient-stock", ex.getMessage(), req);
     }
 
+    @ExceptionHandler(InactiveProductException.class)
+    ProblemDetail handleInactiveProduct(InactiveProductException ex, HttpServletRequest req) {
+        return problem(HttpStatus.UNPROCESSABLE_ENTITY, "/errors/inactive-product", ex.getMessage(), req);
+    }
+
     // 400 (Validation)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ProblemDetail handleValidation(MethodArgumentNotValidException ex, HttpServletRequest req) {
-        var fieldErros = ex.getBindingResult().getFieldErrors().stream()
+        var fieldErrors = ex.getBindingResult().getFieldErrors().stream()
                 .collect(Collectors.toMap(
                         fe -> fe.getField(),
                         fe -> fe.getDefaultMessage(),
                         (a, b) -> a // keep first message per field
                 ));
-        var pd = problem(HttpStatus.BAD_REQUEST, "/errors/validation-failed", "Request validation faild", req);
-        pd.setProperty("fieldErrors", fieldErros);
+        var pd = problem(HttpStatus.BAD_REQUEST, "/errors/validation-failed", "Request validation failed", req);
+        pd.setProperty("fieldErrors", fieldErrors);
         return pd;
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    ProblemDetail handleBadRequest(BadRequestException ex, HttpServletRequest req) {
+        return problem(HttpStatus.BAD_REQUEST, "/errors/business-exception", ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ProblemDetail handleUnreadable(HttpMessageNotReadableException ex, HttpServletRequest req) {
+        return problem(HttpStatus.BAD_REQUEST, "/errors/invalid-request", "Request body is malformed or contains an invalid value", req);
     }
 
     // 500
