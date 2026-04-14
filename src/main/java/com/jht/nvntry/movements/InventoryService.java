@@ -17,6 +17,7 @@ public class InventoryService {
 
     private final LedgerRepository ledgerRepository;
     private final ProductRepository productRepository;
+    private final AdjustmentReasonRepository adjustmentReasonRepository;
 
     @Transactional
     public InventoryMovementResponse processInventoryMovement(
@@ -26,6 +27,9 @@ public class InventoryService {
         // 1. Syntactic validation is handled by @Valid in Controller
         // 2. Semantic/Business validation: Context-dependent rules
         validateBusinessRules(request);
+
+        adjustmentReasonRepository.findByCode(request.reasonCode())
+                .orElseThrow(() -> new ResourceNotFoundException("Reason code not found, code: " + request.reasonCode()));
 
         // 3. Load product -> throw ResourceNotFound if absent. Failure mode 1
         var product = productRepository.findById(request.productId())
