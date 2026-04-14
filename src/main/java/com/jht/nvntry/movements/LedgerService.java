@@ -2,8 +2,7 @@ package com.jht.nvntry.movements;
 
 import com.jht.nvntry.catalog.ProductRepository;
 import com.jht.nvntry.movements.model.request.InventoryMovementRequest;
-import com.jht.nvntry.movements.model.response.InventoryLedgerResponse;
-import com.jht.nvntry.shared.exception.BadRequestException;
+import com.jht.nvntry.movements.model.response.InventoryMovementResponse;
 import com.jht.nvntry.shared.exception.InactiveProductException;
 import com.jht.nvntry.shared.exception.InsufficientStockException;
 import com.jht.nvntry.shared.exception.ResourceNotFoundException;
@@ -19,9 +18,10 @@ public class LedgerService {
     private final ProductRepository productRepository;
 
     @Transactional
-    public InventoryLedgerResponse inventoryMovement(
+    public InventoryMovementResponse inventoryMovement(
+            String idempKey,
             InventoryMovementRequest request
-    ) { // throws BadRequestException for now, handle in @ControllerAdvice
+    ) {
         // 1. Load product -> throw ResourceNotFound if absent. Failure mode 1
         var product = productRepository.findById(request.productId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product", request.productId().toString()));
@@ -31,29 +31,7 @@ public class LedgerService {
             throw new InactiveProductException(product);
         }
 
-        // 3. Validate movement business rules -> reasonCode presence, sign of quantityDelta
-        switch (request.movementType()) {
-            case ADJUST -> {
-                if (request.reasonCode() == null)
-                    throw new BadRequestException(request.movementType() + " should have a reason code");
-                if (request.quantityDelta() == 0)
-                    throw new BadRequestException(request.movementType() + " should not have quantity delta of 0");
-            }
-            case RECEIVE -> {
-                if (request.reasonCode() != null)
-                    throw new BadRequestException(request.movementType() + " should not have a reason code");
-                if (request.quantityDelta() <= 0)
-                    throw new BadRequestException(request.movementType() + " should not have negative quantity delta");
-            }
-            case SHIP -> {
-                if (request.reasonCode() != null)
-                    throw new BadRequestException(request.movementType() + " should not have a reason code");
-                if (request.quantityDelta() >= 0)
-                    throw new BadRequestException(request.movementType() + " should not have positive quantity delta");
-            }
-        }
-
-        // 4. Execute CTE -> atomic stock check + insert
+        // 3. Execute CTE -> atomic stock check + insert
         var result = ledgerRepository.insertWithStockCheck(
                 request.productId(),
                 request.movementType().name(), // Possible bug, call .name() and change repo type to String
@@ -61,13 +39,13 @@ public class LedgerService {
                 request.reasonCode(),
                 request.referenceId(),
                 request.referenceType(),
-                request.idempotencyKey(),
+                idempKey,
                 request.createdBy(),
                 request.note()
         ).orElseThrow(() -> new InsufficientStockException(product.getSku(), 0, request.quantityDelta()));
-        // 5. If CTE returns no rows -> throw Insufficient (stock went negative). Failure mode 3
+        // 4. If CTE returns no rows -> throw Insufficient (stock went negative). Failure mode 3
 
-        // 6. Map result -> return MovementResponse
-        return InventoryLedgerResponse.from(result);
+        // 5. Map result -> return MovementResponse
+        return InventoryMovementResponse.from(result);
     }
 }
