@@ -98,7 +98,7 @@ public class CatalogController {
 //    @PostMapping
 //    @Operation(summary = "Register a new product")
 //    public ResponseEntity<ProductResponse> create(
-//            @Valid @RequestBody CreateProductRequest req
+//            @Valid @RequestBody CreateProductRequest request
 //    ) {
 //        var created = catalogService.create(req);
 //        var location = ServletUriComponentsBuilder
@@ -113,9 +113,9 @@ public class CatalogController {
 //    @Operation(summary = "Update product name")
 //    public ProductResponse updateName(
 //            @PathVariable("id") UUID id,
-//            @RequestBody PatchProductRequest req
+//            @RequestBody PatchProductRequest request
 //    ) {
-//        return catalogService.updateName(id, req);
+//        return catalogService.updateName(id, request);
 //    }
 //
 //    @DeleteMapping("/{id}")
