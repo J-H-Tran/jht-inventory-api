@@ -86,7 +86,7 @@ public class InventoryLedger {
         ledger.referenceType = referenceType;
         ledger.idempotencyKey = idempotencyKey;
         ledger.occurredAt = occurredAt != null ? occurredAt : OffsetDateTime.now();
-        ledger.createdBy = createdBy != null ? createdBy : "System Administrator";
+        ledger.createdBy = createdBy;
         ledger.note = note;
         return ledger;
     }
