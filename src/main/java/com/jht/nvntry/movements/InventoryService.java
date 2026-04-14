@@ -13,12 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class InventoryService {
 
     private final LedgerRepository ledgerRepository;
     private final ProductRepository productRepository;
 
+    @Transactional
     public InventoryMovementResponse processInventoryMovement(
             String idempKey,
             InventoryMovementRequest request

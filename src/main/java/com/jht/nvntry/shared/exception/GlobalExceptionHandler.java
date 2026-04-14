@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
     }
 
     //--- 400 (Validation)
-    // Handle @Valid on Body (MethodArgumentNotValidException
+    // Handle @Valid on Body (MethodArgumentNotValidException)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ProblemDetail handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         var fieldErrors = ex.getBindingResult().getFieldErrors().stream()
