@@ -1,6 +1,7 @@
 package com.jht.nvntry.movements;
 
 import com.jht.nvntry.catalog.ProductRepository;
+import com.jht.nvntry.movements.model.InventoryLedger;
 import com.jht.nvntry.movements.model.request.InventoryMovementRequest;
 import com.jht.nvntry.movements.model.response.InventoryMovementResponse;
 import com.jht.nvntry.shared.exception.BadRequestException;
@@ -28,12 +29,14 @@ public class InventoryService {
         // 2. Semantic/Business validation: Context-dependent rules
         validateBusinessRules(request);
 
-        adjustmentReasonRepository.findByCode(request.reasonCode())
-                .orElseThrow(() -> new ResourceNotFoundException("Reason code not found, code: " + request.reasonCode()));
+        if (request.movementType() == InventoryLedger.MovementType.ADJUST) {
+            adjustmentReasonRepository.findByCode(request.reasonCode())
+                    .orElseThrow(() -> new ResourceNotFoundException("Product", request.reasonCode()));
+        }
 
         // 3. Load product -> throw ResourceNotFound if absent. Failure mode 1
         var product = productRepository.findById(request.productId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found, ID: " + request.productId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", request.productId().toString()));
 
         // 4. Validate active -> throw Insufficient 422 if inactive. Failure mode 2
         if (!product.isActive()) {
@@ -103,6 +106,4 @@ public class InventoryService {
             throw new BadRequestException("Both referenceId and referenceType must be present or both absent");
         }
     }
-    // TODO: return 404 if reasonCode is supplied but does not exist in adjustment_reasons
-    // TODO: return 422 if submitting SHIP would result in negative stock
 }
