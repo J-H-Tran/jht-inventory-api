@@ -98,7 +98,7 @@ public class GlobalExceptionHandler {
     ProblemDetail handleMissingRequestValue(ConstraintViolationException ex, HttpServletRequest request) {
         var fieldErrors = ex.getConstraintViolations().stream()
                 .collect(Collectors.toMap(
-                        v -> v.getPropertyPath().toString(),
+                        violation -> violation.getPropertyPath().toString(),
                         ConstraintViolation::getMessage,
                         (a, b) -> a
                 ));
