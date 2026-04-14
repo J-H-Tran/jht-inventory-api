@@ -25,17 +25,3 @@ public record CreateProductRequest(
         @Schema(description = "Unit in which this product is counted", example = "EACH")
         Product.UnitOfMeasure unitOfMeasure
 ) {}
-//    @NotBlank(message = "SKU is required")
-//    @Size(max = 100, message = "SKU must not exceed 100 characters")
-//    @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "SKU must be alphanumeric with hyphens or underscores only")
-//    @Schema(description = "Unique product identifier", example = "WIDGET-001")
-//    String sku,
-//
-//    @NotBlank(message = "Name is required")
-//    @Size(max = 255, message = "Name must not exceed 255 characters")
-//    @Schema(description = "Human-readable product name", example = "Blue Widget")
-//    String name,
-//
-//    @NotNull(message = "Unit of measure is required")
-//    @Schema(description = "Unit in which this product is counted", example = "EACH")
-//    Product.UnitOfMeasure unitOfMeasure
