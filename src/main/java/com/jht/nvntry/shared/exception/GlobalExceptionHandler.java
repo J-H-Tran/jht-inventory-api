@@ -1,16 +1,22 @@
 package com.jht.nvntry.shared.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.net.URI;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -36,9 +42,11 @@ public class GlobalExceptionHandler {
     * A 200 would be correct if we stored and returned the original response.
     * That is a Week 2 enhancement - for now, reject cleanly.
     * */
-    @ExceptionHandler(IdempotencyConflictException.class)
-    ProblemDetail handleIdempotencyConflict(IdempotencyConflictException ex, HttpServletRequest req) {
-        return problem(HttpStatus.CONFLICT, "/errors/duplicate-movement", ex.getMessage(), req);
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    ProblemDetail handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest req) {
+        // Unique constraint on idempotency_key is the only current source of this
+        return problem(HttpStatus.CONFLICT, "/errors/duplicate-movement",
+                "A movement with this idempotency key already exists", req);
     }
 
     /* 422
@@ -56,8 +64,8 @@ public class GlobalExceptionHandler {
     }
 
     // 400 (Validation)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    ProblemDetail handleValidation(MethodArgumentNotValidException ex, HttpServletRequest req) {
+    @ExceptionHandler(MovementValidationException.class)
+    ProblemDetail handleValidation(MovementValidationException ex, HttpServletRequest req) {
         var fieldErrors = ex.getBindingResult().getFieldErrors().stream()
                 .collect(Collectors.toMap(
                         fe -> fe.getField(),
@@ -69,14 +77,91 @@ public class GlobalExceptionHandler {
         return pd;
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    ProblemDetail handleBadRequest(BadRequestException ex, HttpServletRequest req) {
-        return problem(HttpStatus.BAD_REQUEST, "/errors/business-exception", ex.getMessage(), req);
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    ProblemDetail handleMissingRequestHeader(MissingRequestHeaderException ex, HttpServletRequest req) {
+        var pd = problem(HttpStatus.BAD_REQUEST, "/errors/missing-header", "Required request header is missing", req);
+        pd.setProperty("fieldErrors", Map.of(
+                ex.getHeaderName(), "Header is required"
+        ));
+        return pd;
+    }
+
+    @ExceptionHandler(MissingRequestValueException.class)
+    ProblemDetail handleMissingRequestValue(MissingRequestValueException ex, HttpServletRequest req) {
+        var pd = problem(HttpStatus.BAD_REQUEST, "/errors/missing-value", "Required request value is missing", req);
+        return pd;
+    }
+
+    // If you use @NotBlank on headers, also add:
+    @ExceptionHandler(ConstraintViolationException.class)
+    ProblemDetail handleConstraintViolation(ConstraintViolationException ex, HttpServletRequest req) {
+        var fieldErrors = ex.getConstraintViolations().stream()
+                .collect(Collectors.toMap(
+                        violation -> violation.getPropertyPath().toString(),
+                        ConstraintViolation::getMessage,
+                        (a, b) -> a
+                ));
+
+        var pd = problem(HttpStatus.BAD_REQUEST, "/errors/validation-failed",
+                "Validation failed", req);
+        pd.setProperty("fieldErrors", fieldErrors);
+        return pd;
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ProblemDetail handleUnreadable(HttpMessageNotReadableException ex, HttpServletRequest req) {
-        return problem(HttpStatus.BAD_REQUEST, "/errors/invalid-request", "Request body is malformed or contains an invalid value", req);
+        var pd = problem(HttpStatus.BAD_REQUEST, "/errors/validation-failed", "Request body is malformed or contains invalid values", req);
+        // Extract the root cause message
+        Throwable cause = ex.getRootCause();
+        String message = cause != null ? cause.getMessage() : ex.getMessage();
+        // Parse common Jackson errors
+        Map<String, String> fieldErrors = new HashMap<>();
+
+        if (message.contains("Cannot deserialize value of type")) {
+            // Extract field name from error message
+            // Example: "Cannot deserialize value of type `...MovementType` from String \"invalid\": not one of...")
+            if (message.contains("MovementType")) {
+                fieldErrors.put("movementType", "Invalid movement type. Must be RECEIVE, SHIP, or ADJUST");
+            }
+        }
+        if (message.contains("UUID")) {
+            fieldErrors.put("productId", "Invalid UUID format");
+        }
+
+        if (fieldErrors.isEmpty()) {
+            pd.setProperty("error", message);
+        } else {
+            pd.setProperty("fieldErrors", fieldErrors);
+        }
+        return pd;
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    ProblemDetail handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest req) {
+        var pd = problem(HttpStatus.BAD_REQUEST, "errors/validation-failed", "Validation failed", req);
+
+        // Extract which field from message
+        String message = ex.getMessage();
+        Map<String, String> fieldErrors = new HashMap<>();
+
+        if (message.contains("Product id")) {
+            fieldErrors.put("productId", message);
+        } else if (message.contains("Movement type")) {
+            fieldErrors.put("movementType", message);
+        } else if (message.contains("Quantity delta")) {
+            fieldErrors.put("quantityDelta", message);
+        } else {
+            pd.setProperty("error", message);
+        }
+        if (!fieldErrors.isEmpty()) {
+            pd.setProperty("fieldErrors", fieldErrors);
+        }
+        return pd;
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    ProblemDetail handleBadRequest(BadRequestException ex, HttpServletRequest req) {
+        return problem(HttpStatus.BAD_REQUEST, "/errors/business-exception", ex.getMessage(), req);
     }
 
     // 500
