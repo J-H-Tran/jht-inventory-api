@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record InventoryLedgerResponse(
+public record InventoryMovementResponse(
 
         @Schema(description = "Unique Ledger ID")
         UUID id,
@@ -19,8 +19,8 @@ public record InventoryLedgerResponse(
         String createdBy,
         String note
 ) {
-    public static InventoryLedgerResponse from(InventoryLedger i) {
-        return new InventoryLedgerResponse(
+    public static InventoryMovementResponse from(InventoryLedger i) {
+        return new InventoryMovementResponse(
                 i.getId(),
                 i.getProductId(),
                 i.getMovementType(),

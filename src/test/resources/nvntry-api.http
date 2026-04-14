@@ -38,16 +38,16 @@ DELETE {{baseUrl}}/v1/products/9f39b18a-322f-45a2-8a6a-29f7efbbd70e
 ## Inventory
 ### Movements
 POST {{baseUrl}}/v1/inventory/movements
+Idempotency-Key: sys-2024-006-vtuber
 Content-Type: application/json
 
 {
   "product_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "movement_type": "ADJUST",
-  "quantity_delta": 1,
+  "quantity_delta": -1,
   "reason_code": "SYSTEM_CORRECTION",
   "reference_id": "cccccccc-cccc-cccc-cccc-cccccccccccd",
   "reference_type": "",
-  "idempotency_key": "sys-2024-002-vtuber",
   "created_by": "system",
   "note": "Discovered from the wild"
 }
