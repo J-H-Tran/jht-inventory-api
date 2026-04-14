@@ -61,7 +61,8 @@ public class GlobalExceptionHandler {
             }
         }
         // Fallback for other DB constraints
-        return problem(HttpStatus.BAD_REQUEST, "/errors/data-integrity", "Database constraint violation", request);
+        log.error("Unexpected date integrity violation", ex);
+        return problem(HttpStatus.INTERNAL_SERVER_ERROR, "/errors/internal", "An unexpected error occurred", request);
     }
 
     /* 422

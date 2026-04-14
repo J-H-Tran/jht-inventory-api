@@ -27,7 +27,7 @@ public class CatalogService {
     public ProductResponse getById(UUID id) {
         // 1. Check DB if already exists
         var product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found, ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", id.toString()));
         // 2. Return data found
         return ProductResponse.from(product);
     }
@@ -37,7 +37,7 @@ public class CatalogService {
         String normalisedSku = sku.strip().toUpperCase();
         // 1. Check DB if already exists
         var product = productRepository.findBySku(normalisedSku)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found, SKU: " + normalisedSku));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", normalisedSku));
         // 2. Return data found
         return ProductResponse.from(product);
     }
@@ -70,7 +70,7 @@ public class CatalogService {
     public ProductResponse updateName(UUID id, PatchProductRequest request) {
         // 1. Check DB if already exists
         var product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found, ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", id.toString()));
         // 2. Update data
         product.setName(request.name());
         /* Design issue worth noting — save() on dirty entities
@@ -112,7 +112,7 @@ public class CatalogService {
     public void deactivate(UUID id) {
         // 1. Check DB if already exists
         var product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found, ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", id.toString()));
         // 2. Update data
         product.setActive(false);
         // No save() - Hibernate dirty checking flushes the mutation on commit

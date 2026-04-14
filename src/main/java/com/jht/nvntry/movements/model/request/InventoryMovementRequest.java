@@ -26,5 +26,4 @@ public record InventoryMovementRequest(
         @Size(max = 100, message = "Created by must not exceed 100 characters")
         String createdBy,
         String note
-) {
-}
+) {}
