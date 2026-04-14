@@ -1,8 +1,8 @@
 package com.jht.nvntry.catalog;
 
+import com.jht.nvntry.catalog.model.Product;
 import com.jht.nvntry.catalog.model.request.CreateProductRequest;
 import com.jht.nvntry.catalog.model.request.PatchProductRequest;
-import com.jht.nvntry.catalog.model.Product;
 import com.jht.nvntry.catalog.model.response.ProductResponse;
 import com.jht.nvntry.shared.exception.ConflictException;
 import com.jht.nvntry.shared.exception.ResourceNotFoundException;
@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.UUID;
 
 @Service
@@ -118,54 +119,3 @@ public class CatalogService {
         // productRepository.save(product);
     }
 }
-//    private final ProductRepository productRepository;
-//
-//    @Transactional(readOnly = true)
-//    public ProductResponse getById(UUID id) {
-//        Product product = productRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Product ", id.toString()));
-//        return ProductResponse.from(product);
-//    }
-//
-//    @Transactional(readOnly = true)
-//    public ProductResponse getBySku(String sku) {
-//        Product product = productRepository.findBySku(sku.strip().toUpperCase())
-//                .orElseThrow(() -> new ResourceNotFoundException("Product ", sku));
-//        return ProductResponse.from(product);
-//    }
-//
-//    @Transactional(readOnly = true)
-//    public Page<ProductResponse> listActive(Pageable pageable) {
-//        return productRepository.findAllActive(pageable)
-//                .map(ProductResponse::from);
-//    }
-//
-//    @Transactional
-//    public ProductResponse create(CreateProductRequest req) {
-//        String normalisedSku = req.sku().strip().toUpperCase();
-//
-//        if (productRepository.existsBySku(normalisedSku)) {
-//            throw new ConflictException("Product with SKU '" + normalisedSku + "' already exists");
-//        }
-//
-//        var product = Product.create(normalisedSku, req.name(), req.unitOfMeasure());
-//        return ProductResponse.from(productRepository.save(product));
-//    }
-//
-//    @Transactional
-//    public ProductResponse updateName(UUID id, PatchProductRequest req) {
-//        var product = productRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Product ", id.toString()));
-//
-//        product.setName(req.name().strip());
-//        // No explicit save() needed - JPA dirty checking detects the mutation
-//        // and issues the UPDATE on transaction commit. This is intentional.
-//        return ProductResponse.from(product);
-//    }
-//
-//    @Transactional
-//    public void deactivate(UUID id) {
-//        var product = productRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Product ", id.toString()));
-//        product.setActive(false);
-//    }

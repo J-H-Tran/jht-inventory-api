@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import java.util.UUID;
 
 @RestController
@@ -85,44 +86,3 @@ public class CatalogController {
         return ResponseEntity.noContent().build();
     }
 }
-//    private final CatalogService catalogService;
-//
-//    @GetMapping
-//    @Operation(summary = "List active products")
-//    public Page<ProductResponse> listActive(
-//            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
-//    ) {
-//        return catalogService.listActive(pageable);
-//    }
-//
-//    @PostMapping
-//    @Operation(summary = "Register a new product")
-//    public ResponseEntity<ProductResponse> create(
-//            @Valid @RequestBody CreateProductRequest req
-//    ) {
-//        var created = catalogService.create(req);
-//        var location = ServletUriComponentsBuilder
-//                .fromCurrentRequest()
-//                .path("/{id}")
-//                .buildAndExpand(created.id())
-//                .toUri();
-//        return ResponseEntity.created(location).body(created);
-//    }
-//
-//    @PatchMapping("/{id}/name")
-//    @Operation(summary = "Update product name")
-//    public ProductResponse updateName(
-//            @PathVariable("id") UUID id,
-//            @RequestBody PatchProductRequest req
-//    ) {
-//        return catalogService.updateName(id, req);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    @Operation(summary = "Deactivate a product (soft delete)")
-//    public ResponseEntity<ProductResponse> deactivate(
-//            @PathVariable("id") UUID id
-//    ) {
-//        catalogService.deactivate(id);
-//        return ResponseEntity.noContent().build();
-//    }
