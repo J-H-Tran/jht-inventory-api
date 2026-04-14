@@ -7,18 +7,17 @@ import java.util.UUID;
 
 public record InventoryMovementRequest(
 
-        @NotNull(message = "Product id is required")
+        @NotNull
         UUID productId,
 
-        @NotNull(message = "Movement type is required")
+        @NotNull
         InventoryLedger.MovementType movementType,
 
-        @NotNull(message = "Quantity delta is required")
+        @NotNull
         Integer quantityDelta,
 
         @Size(max = 50, message = "Reason code must not exceed 50 characters")
         String reasonCode,
-
         UUID referenceId,
 
         @Size(max = 30, message = "Reference type must not exceed 30 characters")
@@ -26,7 +25,6 @@ public record InventoryMovementRequest(
 
         @Size(max = 100, message = "Created by must not exceed 100 characters")
         String createdBy,
-
         String note
 ) {
 }
