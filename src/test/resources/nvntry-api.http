@@ -51,3 +51,7 @@ Content-Type: application/json
   "created_by": "system",
   "note": "Discovered from the wild"
 }
+
+### Stock
+GET {{baseUrl}}/v1/inventory/stock/d0e1f2a3-b4c5-6789-defa-012345678901
+Content-Type: application/json
