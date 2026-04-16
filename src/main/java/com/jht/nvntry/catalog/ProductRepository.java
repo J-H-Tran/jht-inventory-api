@@ -20,10 +20,10 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     * Named query so the intent is visible at the call site
     * */
     @Query("""
-        select p
-        from Product p
-        where p.active = true
-        order by p.createdAt desc
+        SELECT p
+        FROM Product p
+        WHERE p.active = TRUE
+        ORDER BY p.createdAt DESC
     """)
     Page<Product> findAllActive(Pageable pageable);
 }
