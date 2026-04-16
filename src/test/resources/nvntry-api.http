@@ -55,3 +55,15 @@ Content-Type: application/json
 ### Stock
 GET {{baseUrl}}/v1/inventory/stock/d0e1f2a3-b4c5-6789-defa-012345678901
 Content-Type: application/json
+
+### Inv Movements by Product ID (First)
+GET {{baseUrl}}/v1/inventory/movements?
+    productId=d4e5f6a7-b8c9-0123-defa-456789012345
+Content-Type: application/json
+
+### Inv Movements by Product ID (Subsequent)
+GET {{baseUrl}}/v1/inventory/movements?
+    productId=d4e5f6a7-b8c9-0123-defa-456789012345
+    &lastSeenId=xx
+    &lastSeenOccurredAt=xx
+Content-Type: application/json
