@@ -11,13 +11,7 @@ import java.util.UUID;
 @Repository
 public interface LedgerRepository extends JpaRepository<InventoryLedger, UUID> {
 
-//    @Query("""
-//        select i
-//        from InventoryLedger i
-//        where i.productId = :productId
-//        and i.referenceId = :referenceId
-//    """)
-//    InventoryLedger findByProductId(UUID productId, UUID referenceId);
+    boolean existsByProductId(UUID productId);
 
     /* Two concurrent requests can both pass the check before either inserts, resulting in negative stock.
      * How This Query Fixes It.
@@ -74,4 +68,11 @@ public interface LedgerRepository extends JpaRepository<InventoryLedger, UUID> {
             @Param("createdBy") String createdBy,
             @Param("note") String note
     );
+
+    @Query("""
+        SELECT coalesce(sum(i.quantityDelta), 0)
+        FROM InventoryLedger i
+        WHERE i.productId = :productId
+    """)
+    int currentStockLevel(@Param("productId") UUID productId);
 }
