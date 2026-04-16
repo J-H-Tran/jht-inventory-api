@@ -4,6 +4,7 @@ import com.jht.nvntry.catalog.ProductRepository;
 import com.jht.nvntry.movements.model.InventoryLedger;
 import com.jht.nvntry.movements.model.request.InventoryMovementRequest;
 import com.jht.nvntry.movements.model.response.InventoryMovementResponse;
+import com.jht.nvntry.movements.model.response.InventoryStockResponse;
 import com.jht.nvntry.shared.exception.BadRequestException;
 import com.jht.nvntry.shared.exception.InactiveProductException;
 import com.jht.nvntry.shared.exception.InsufficientStockException;
@@ -11,6 +12,8 @@ import com.jht.nvntry.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +34,7 @@ public class InventoryService {
 
         if (request.movementType() == InventoryLedger.MovementType.ADJUST) {
             adjustmentReasonRepository.findByCode(request.reasonCode())
-                    .orElseThrow(() -> new ResourceNotFoundException("Product", request.reasonCode()));
+                    .orElseThrow(() -> new ResourceNotFoundException("AdjustmentReason", request.reasonCode()));
         }
 
         // 3. Load product -> throw ResourceNotFound if absent. Failure mode 1
@@ -59,6 +62,14 @@ public class InventoryService {
 
         // 7. Map result -> return MovementResponse
         return InventoryMovementResponse.from(ledgerEntry);
+    }
+
+    @Transactional(readOnly = true)
+    public InventoryStockResponse stockLevel(UUID id) {
+        var product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", id.toString()));
+        int currentStock = ledgerRepository.currentStockLevel(id);
+        return new InventoryStockResponse(product.getId(), product.getSku(), currentStock, product.getUnitOfMeasure());
     }
 
     private void validateBusinessRules(InventoryMovementRequest request) {
