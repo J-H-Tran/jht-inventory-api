@@ -2,6 +2,7 @@ package com.jht.nvntry.movements;
 
 import com.jht.nvntry.movements.model.request.InventoryMovementRequest;
 import com.jht.nvntry.movements.model.response.InventoryMovementResponse;
+import com.jht.nvntry.movements.model.response.InventoryStockResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -10,12 +11,16 @@ import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/inventory")
@@ -42,5 +47,13 @@ public class InventoryController {
                 .buildAndExpand(response.id())
                 .toUri();
         return ResponseEntity.created(location).body(response);
+    }
+
+    @GetMapping("/stock/{productId}")
+    @Operation(summary = "Get current stock level for a product")
+    public ResponseEntity<InventoryStockResponse> stock(
+            @PathVariable("productId")UUID id
+            ) {
+        return ResponseEntity.ok().body(inventoryService.stockLevel(id));
     }
 }
