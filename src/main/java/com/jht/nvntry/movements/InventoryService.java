@@ -49,8 +49,8 @@ public class InventoryService {
         if (lastSeenId != null && lastSeenOccurredAt == null) {
             throw new IllegalArgumentException("Both cursor fields must be provided");
         }
-        // Compute hasMore field indicator
-        /* Your response already shows the problem. Look at what's in the response body:
+        /* Compute hasMore field indicator:
+         * Your response already shows the problem. Look at what's in the response body:
          * {
          *    "pageable": { "offset": 0 ... },
          *    "total_elements": 3,
@@ -62,17 +62,17 @@ public class InventoryService {
          * history can skip entries or see duplicates without knowing it. For a ledger that's being written to
          * continuously, this is a real correctness problem, not a theoretical one.
          *
-         * Keyset pagination says "give me rows where id > lastSeenId" — the position is anchored to a specific row,
-         * not a row count. Inserts between pages don't affect what you see.
+         * Keyset pagination with cursor says "give me rows where id > lastSeenId and occurredAt > lastSeenOccurredAt" —
+         * the position is anchored to a specific row, not a row count. Inserts between pages don't affect what you see.
          * */
-        var entries = ledgerRepository.findByProductIdAfter(
-            id,
-            lastSeenId,
-            lastSeenOccurredAt,
-            PageRequest.of(0, limit + 1)
-        ).stream()
-        .map(InventoryProductMovementResponse::from)
-        .collect(Collectors.toList());
+        var entries = ledgerRepository.findByProductIdAfterAndOccurredAtAfter(
+                            id,
+                            lastSeenId,
+                            lastSeenOccurredAt,
+                            PageRequest.of(0, limit + 1)
+                        ).stream()
+                        .map(InventoryProductMovementResponse::from)
+                        .collect(Collectors.toList());
 
         boolean hasMore = entries.size() > limit;
         var content = hasMore ? entries.subList(0, limit) : entries;
@@ -107,7 +107,7 @@ public class InventoryService {
 
         // 4. Validate active -> throw Insufficient 422 if inactive. Failure mode 2
         if (!product.isActive()) {
-            throw new InactiveProductException("Product '" + product.getSku() + "' is inactive and cannot receive movements");
+            throw new InactiveProductException("Product '" + product.getSku() + "' is inactive");
         }
 
         // 5. Execute CTE -> atomic stock check + insert. Core: Atomic Ledger Update
@@ -146,30 +146,36 @@ public class InventoryService {
                     throw new BadRequestException(request.movementType().name() + " movement requires a reason code");
                 }
                 if (request.quantityDelta() == 0) {
-                    throw new BadRequestException(request.movementType().name() + " movement must have non-zero quantity delta");
+                    throw new BadRequestException(request.movementType().name()
+                            + " movement must have non-zero quantity delta");
                 }
             }
             case RECEIVE -> {
                 if (request.reasonCode() != null && !request.reasonCode().isBlank()) {
-                    throw new BadRequestException(request.movementType().name() + " movement should not have a reason code");
+                    throw new BadRequestException(request.movementType().name()
+                            + " movement should not have a reason code");
                 }
                 if (request.quantityDelta() <= 0) {
-                    throw new BadRequestException(request.movementType().name() + " movement must have positive quantity delta");
+                    throw new BadRequestException(request.movementType().name()
+                            + " movement must have positive quantity delta");
                 }
             }
             case SHIP -> {
                 if (request.reasonCode() != null && !request.reasonCode().isBlank()) {
-                    throw new BadRequestException(request.movementType().name() + " movement should not have a reason code");
+                    throw new BadRequestException(request.movementType().name()
+                            + " movement should not have a reason code");
                 }
                 if (request.quantityDelta() >= 0) {
-                    throw new BadRequestException(request.movementType().name() + " movement must have negative quantity delta");
+                    throw new BadRequestException(request.movementType().name()
+                            + " movement must have negative quantity delta");
                 }
             }
         }
 
         // Reference consistency
-        if ((request.referenceId() == null && request.referenceType() != null) ||
-            (request.referenceId() != null && request.referenceType() == null)) {
+        boolean bothPresent = request.referenceId() != null && request.referenceType() != null;
+        boolean bothAbsent = request.referenceId() == null && request.referenceType() == null;
+        if (!(bothPresent || bothAbsent)) {
             throw new BadRequestException("Both referenceId and referenceType must be present or both absent");
         }
     }

@@ -57,7 +57,9 @@ public class GlobalExceptionHandler {
                         psql.getServerErrorMessage().getConstraint() : null;
 
                 if (constraint != null && constraint.contains("idempotency")) {
-                    return problem(HttpStatus.CONFLICT, "/errors/duplicate-movement", "Duplicate idempotency key", request);
+                    return problem(
+                            HttpStatus.CONFLICT, "/errors/duplicate-movement", "Duplicate idempotency key", request
+                    );
                 }
             }
         }
@@ -111,14 +113,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MissingRequestHeaderException.class)
     ProblemDetail handleMissingHeader(MissingRequestHeaderException ex, HttpServletRequest request) {
-        var pd = problem(HttpStatus.BAD_REQUEST, "/errors/missing-header", "Require request header is missing", request);
+        var pd = problem(
+                HttpStatus.BAD_REQUEST, "/errors/missing-header", "Require request header is missing", request
+        );
         pd.setProperty("fieldErrors", Map.of(ex.getHeaderName(), "Header is required"));
         return pd;
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ProblemDetail handleUnreadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
-        var pd = problem(HttpStatus.BAD_REQUEST, "/errors/validation-failed", "Request body is malformed or contains invalid values", request);
+        var pd = problem(
+                HttpStatus.BAD_REQUEST,
+                "/errors/validation-failed",
+                "Request body is malformed or contains invalid values",
+                request
+        );
         // Extract the root cause message
         Throwable cause = ex.getRootCause();
         String message = cause != null ? cause.getMessage() : ex.getMessage();
