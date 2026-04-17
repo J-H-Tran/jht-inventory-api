@@ -57,7 +57,7 @@ public class CatalogController {
     @PostMapping
     @Operation(summary = "Register a new product")
     public ResponseEntity<ProductResponse> create(
-            @Valid @RequestBody CreateProductRequest request // @Valid enables validation annotations ie. @NotBlank, etc.
+            @Valid @RequestBody CreateProductRequest request // @Valid enables validation annotations
     ) { // Create: response status 201 CREATED, input: body w/ Product info
         var created = catalogService.create(request);
         var location = ServletUriComponentsBuilder

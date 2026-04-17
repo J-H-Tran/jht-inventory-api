@@ -44,6 +44,7 @@ public class InventoryController {
     }
 
     @GetMapping("/movements")
+    @Operation(summary = "Get inventory movement history of a product")
     public ResponseEntity<MovementHistoryResponse> inventoryMovementHistory(
             @RequestParam("productId") UUID id,
             @RequestParam(required = false) UUID lastSeenId,
@@ -51,9 +52,7 @@ public class InventoryController {
             @RequestParam(defaultValue ="20") @Max(100) int limit
     ) {
         return ResponseEntity.ok(
-                inventoryService.reportInventoryMovementHistory(
-                        id, lastSeenId, lastSeenOccurredAt, limit
-                )
+                inventoryService.reportInventoryMovementHistory(id, lastSeenId, lastSeenOccurredAt, limit)
         );
     }
 

@@ -15,7 +15,8 @@ import java.util.UUID;
 @Repository
 public interface LedgerRepository extends JpaRepository<InventoryLedger, UUID> {
     @Query("""
-        SELECT i FROM InventoryLedger i
+        SELECT i
+        FROM InventoryLedger i
         WHERE i.productId = :productId
         AND (
             :lastSeenId IS NULL OR
@@ -24,7 +25,7 @@ public interface LedgerRepository extends JpaRepository<InventoryLedger, UUID> {
         )
         ORDER BY i.occurredAt DESC, i.id DESC
     """)
-    List<InventoryLedger> findByProductIdAfter(
+    List<InventoryLedger> findByProductIdAfterAndOccurredAtAfter(
             @Param("productId") UUID productId,
             @Param("lastSeenId") UUID lastSeenId,
             @Param("lastSeenOccurredAt") OffsetDateTime lastSeenOccurredAt,
