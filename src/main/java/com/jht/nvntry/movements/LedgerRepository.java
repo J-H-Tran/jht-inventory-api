@@ -1,17 +1,36 @@
 package com.jht.nvntry.movements;
 
 import com.jht.nvntry.movements.model.InventoryLedger;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface LedgerRepository extends JpaRepository<InventoryLedger, UUID> {
-
-    boolean existsByProductId(UUID productId);
+    @Query("""
+        SELECT i
+        FROM InventoryLedger i
+        WHERE i.productId = :productId
+        AND (
+            :lastSeenId IS NULL OR
+            i.occurredAt < :lastSeenOccurredAt OR
+            (i.occurredAt = :lastSeenOccurredAt AND i.id < :lastSeenId)
+        )
+        ORDER BY i.occurredAt DESC, i.id DESC
+    """)
+    List<InventoryLedger> findByProductIdAfterAndOccurredAtAfter(
+            @Param("productId") UUID productId,
+            @Param("lastSeenId") UUID lastSeenId,
+            @Param("lastSeenOccurredAt") OffsetDateTime lastSeenOccurredAt,
+            Pageable pageable
+    );
 
     /* Two concurrent requests can both pass the check before either inserts, resulting in negative stock.
      * How This Query Fixes It.

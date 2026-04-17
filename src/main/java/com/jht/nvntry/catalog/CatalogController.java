@@ -36,28 +36,28 @@ public class CatalogController {
     public ResponseEntity<ProductResponse> getProductById(
             @PathVariable("id") UUID id
     ) { // Get id: response 200 OK, input: Product id
-        return ResponseEntity.ok().body(catalogService.getById(id));
+        return ResponseEntity.ok(catalogService.getById(id));
     }
 
     @GetMapping("/sku/{sku}")
     public ResponseEntity<ProductResponse> getProductBySku(
             @PathVariable("sku") String sku
     ) { // Get sku: response 200 OK, input Product sku
-        return ResponseEntity.ok().body(catalogService.getBySku(sku));
+        return ResponseEntity.ok(catalogService.getBySku(sku));
     }
 
     @GetMapping
     @Operation(summary = "List active products")
-    public Page<ProductResponse> listActive(
+    public ResponseEntity<Page<ProductResponse>> listActive(
             @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
     ) { // Search: response status 200 OK, input: filters (pageable)
-        return catalogService.listActive(pageable);
+        return ResponseEntity.ok(catalogService.listActive(pageable));
     }
 
     @PostMapping
     @Operation(summary = "Register a new product")
     public ResponseEntity<ProductResponse> create(
-            @Valid @RequestBody CreateProductRequest request // @Valid enables validation annotations ie. @NotBlank, etc.
+            @Valid @RequestBody CreateProductRequest request // @Valid enables validation annotations
     ) { // Create: response status 201 CREATED, input: body w/ Product info
         var created = catalogService.create(request);
         var location = ServletUriComponentsBuilder
@@ -74,7 +74,7 @@ public class CatalogController {
             @PathVariable("id") UUID id,
             @Valid @RequestBody PatchProductRequest request
     ) { // Update: response status 200 OK, input: UUID id + body w/ name
-        return ResponseEntity.ok().body(catalogService.updateName(id, request));
+        return ResponseEntity.ok(catalogService.updateName(id, request));
     }
 
     @DeleteMapping("/{id}")
