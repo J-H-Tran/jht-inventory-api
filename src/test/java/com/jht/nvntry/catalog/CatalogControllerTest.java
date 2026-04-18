@@ -123,7 +123,7 @@ public class CatalogControllerTest {
 
             mockMvc.perform(get("/v1/products"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.total_elements").value(2))
+                    .andExpect(jsonPath("$.size").value(2))
                     .andExpect(jsonPath("$.content.length()").value(2))
                     .andExpect(jsonPath("$.content[0].sku").value("ACTIVE-2"))
                     .andExpect(jsonPath("$.content[1].sku").value("ACTIVE-1"));
@@ -138,7 +138,7 @@ public class CatalogControllerTest {
 
             mockMvc.perform(get("/v1/products"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.total_elements").value(0))
+                    .andExpect(jsonPath("$.size").value(0))
                     .andExpect(jsonPath("$.content.length()").value(0));
         }
     }
