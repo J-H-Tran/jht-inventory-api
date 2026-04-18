@@ -1,11 +1,13 @@
 package com.jht.nvntry.shared.exception;
 
+import com.jht.nvntry.shared.filter.TraceIdFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -27,15 +29,25 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    private final String NOT_FOUND_CODE = "404";
+    private final String CONFLICT_CODE = "409";
+    private final String UNPROCESSABLE_ENTITY_CODE = "422";
+    private final String BAD_REQUEST_CODE = "400";
+    private final String INTERNAL_SERVER_ERROR_CODE = "500";
+
     //--- 404
     @ExceptionHandler(ResourceNotFoundException.class)
     ProblemDetail handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
+        MDC.put("status", NOT_FOUND_CODE);
+        log.info("request.not_found: {}", ex.getMessage());
         return problem(HttpStatus.NOT_FOUND, "/errors/not-found", ex.getMessage(), request);
     }
 
     //--- 409
     @ExceptionHandler(ConflictException.class)
     ProblemDetail handleConflict(ConflictException ex, HttpServletRequest request) {
+        MDC.put("status", CONFLICT_CODE);
+        log.info("request.conflict: {}", ex.getMessage());
         return problem(HttpStatus.CONFLICT, "/errors/conflict", ex.getMessage(), request);
     }
 
@@ -57,6 +69,8 @@ public class GlobalExceptionHandler {
                         psql.getServerErrorMessage().getConstraint() : null;
 
                 if (constraint != null && constraint.contains("idempotency")) {
+                    MDC.put("status", CONFLICT_CODE);
+                    log.info("request.conflict: {}", ex.getMessage());
                     return problem(
                             HttpStatus.CONFLICT, "/errors/duplicate-movement", "Duplicate idempotency key", request
                     );
@@ -64,7 +78,8 @@ public class GlobalExceptionHandler {
             }
         }
         // Fallback for other DB constraints
-        log.error("Unexpected date integrity violation", ex);
+        MDC.put("status", INTERNAL_SERVER_ERROR_CODE);
+        log.error("Unexpected data integrity violation", ex);
         return problem(HttpStatus.INTERNAL_SERVER_ERROR, "/errors/internal", "An unexpected error occurred", request);
     }
 
@@ -74,11 +89,15 @@ public class GlobalExceptionHandler {
     * */
     @ExceptionHandler(InsufficientStockException.class)
     ProblemDetail handleInsufficientStock(InsufficientStockException ex, HttpServletRequest request) {
+        MDC.put("status", UNPROCESSABLE_ENTITY_CODE);
+        log.info("request.unprocessable_entity: {}", ex.getMessage());
         return problem(HttpStatus.UNPROCESSABLE_ENTITY, "/errors/insufficient-stock", ex.getMessage(), request);
     }
 
     @ExceptionHandler(InactiveProductException.class)
     ProblemDetail handleInactiveProduct(InactiveProductException ex, HttpServletRequest request) {
+        MDC.put("status", UNPROCESSABLE_ENTITY_CODE);
+        log.info("request.unprocessable_entity: {}", ex.getMessage());
         return problem(HttpStatus.UNPROCESSABLE_ENTITY, "/errors/inactive-product", ex.getMessage(), request);
     }
 
@@ -92,6 +111,8 @@ public class GlobalExceptionHandler {
                         FieldError::getDefaultMessage,
                         (a, b) -> a
                 ));
+        MDC.put("status", BAD_REQUEST_CODE);
+        log.info("request.bad_request: {}", ex.getMessage());
         var pd = problem(HttpStatus.BAD_REQUEST, "/errors/validation", "Validation failed", request);
         pd.setProperty("fieldErrors", fieldErrors);
         return pd;
@@ -106,6 +127,8 @@ public class GlobalExceptionHandler {
                         ConstraintViolation::getMessage,
                         (a, b) -> a
                 ));
+        MDC.put("status", BAD_REQUEST_CODE);
+        log.info("request.bad_request: {}", ex.getMessage());
         var pd = problem(HttpStatus.BAD_REQUEST, "/errors/validation", "Invalid request parameters", request);
         pd.setProperty("fieldErrors", fieldErrors);
         return pd;
@@ -113,6 +136,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MissingRequestHeaderException.class)
     ProblemDetail handleMissingHeader(MissingRequestHeaderException ex, HttpServletRequest request) {
+        MDC.put("status", BAD_REQUEST_CODE);
+        log.info("request.bad_request: {}", ex.getMessage());
         var pd = problem(
                 HttpStatus.BAD_REQUEST, "/errors/missing-header", "Require request header is missing", request
         );
@@ -122,6 +147,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ProblemDetail handleUnreadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
+        MDC.put("status", BAD_REQUEST_CODE);
+        log.info("request.bad_request: {}", ex.getMessage());
         var pd = problem(
                 HttpStatus.BAD_REQUEST,
                 "/errors/validation-failed",
@@ -153,12 +180,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     ProblemDetail handleBadRequest(BadRequestException ex, HttpServletRequest request) {
+        MDC.put("status", BAD_REQUEST_CODE);
+        log.info("request.bad_request: {}", ex.getMessage());
         return problem(HttpStatus.BAD_REQUEST, "/errors/business-exception", ex.getMessage(), request);
     }
 
     //--- 500
     @ExceptionHandler(Exception.class)
     ProblemDetail handleUnexpected(Exception ex, HttpServletRequest request) {
+        MDC.put("status", INTERNAL_SERVER_ERROR_CODE);
         log.error("Unhandled exception on {} {}", request.getMethod(), request.getRequestURI(), ex);
         return problem(HttpStatus.INTERNAL_SERVER_ERROR, "/errors/internal", "An unexpected error occurred", request);
     }
@@ -174,6 +204,7 @@ public class GlobalExceptionHandler {
         pd.setType(URI.create(type));
         pd.setProperty("timestamp", Instant.now());
         pd.setProperty("path", request.getRequestURI());
+        pd.setProperty("traceId", MDC.get(TraceIdFilter.TRACE_ID_KEY));
         return pd;
     }
 }
