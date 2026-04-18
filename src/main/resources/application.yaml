@@ -40,6 +40,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc:
           time_zone: UTC
+    open-in-view: false
 
   flyway:
     enabled: true
@@ -47,19 +48,6 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
 
-#  docker:
-#    compose:
-#      enabled: false
-
   # Configuration for response fields naming convention
   jackson:
     property-naming-strategy: SNAKE_CASE
-
-logging:
-  level:
-    root: INFO
-    com.example.inventory: DEBUG
-    org.hibernate.SQL: DEBUG # shows actual SQL in dev
-    org.hibernate.orm.jdbc.bind: TRACE # shows bound parameters
-  pattern:
-    console: "%d{yyy-MM-dd HH:mm:ss} [%thread] [%X{tradeId}] %-5level %logger{36} - %msg%n"
