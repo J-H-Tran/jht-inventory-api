@@ -1,6 +1,6 @@
 package com.jht.nvntry.movements;
 
-import com.jht.nvntry.catalog.ProductRepository;
+import com.jht.nvntry.catalog.repository.ProductRepository;
 import com.jht.nvntry.movements.model.InventoryLedger;
 import com.jht.nvntry.movements.model.request.InventoryMovementRequest;
 import com.jht.nvntry.movements.model.response.InventoryMovementResponse;

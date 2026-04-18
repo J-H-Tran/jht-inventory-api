@@ -1,13 +1,14 @@
-package com.jht.nvntry.catalog;
+package com.jht.nvntry.catalog.controller;
 
 import com.jht.nvntry.catalog.model.request.CreateProductRequest;
 import com.jht.nvntry.catalog.model.request.PatchProductRequest;
+import com.jht.nvntry.catalog.model.response.PagedProductResponse;
 import com.jht.nvntry.catalog.model.response.ProductResponse;
+import com.jht.nvntry.catalog.service.CatalogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class CatalogController {
 
     @GetMapping
     @Operation(summary = "List active products")
-    public ResponseEntity<Page<ProductResponse>> listActive(
+    public ResponseEntity<PagedProductResponse> listActive(
             @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
     ) { // Search: response status 200 OK, input: filters (pageable)
         return ResponseEntity.ok(catalogService.listActive(pageable));
