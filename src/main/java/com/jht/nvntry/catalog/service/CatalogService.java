@@ -1,18 +1,20 @@
-package com.jht.nvntry.catalog;
+package com.jht.nvntry.catalog.service;
 
 import com.jht.nvntry.catalog.model.Product;
 import com.jht.nvntry.catalog.model.request.CreateProductRequest;
 import com.jht.nvntry.catalog.model.request.PatchProductRequest;
+import com.jht.nvntry.catalog.model.response.PagedProductResponse;
 import com.jht.nvntry.catalog.model.response.ProductResponse;
+import com.jht.nvntry.catalog.repository.ProductRepository;
 import com.jht.nvntry.shared.exception.ConflictException;
 import com.jht.nvntry.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,10 +45,20 @@ public class CatalogService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductResponse> listActive(Pageable pageable) {
+    public PagedProductResponse listActive(Pageable pageable) {
         // 1. Return data found, could be empty list -> not an error case
-        return productRepository.findAllActive(pageable)
-                .map(ProductResponse::from);
+        var products = productRepository.findAllActive(pageable)
+                .stream()
+                .map(ProductResponse::from)
+                .collect(Collectors.toList());
+        int size = products.size();
+        boolean hasNext = size > 20;
+
+        return new PagedProductResponse(
+                products,
+                size,
+                hasNext
+        );
     }
 
     @Transactional
