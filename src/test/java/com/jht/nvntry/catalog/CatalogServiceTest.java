@@ -3,7 +3,10 @@ package com.jht.nvntry.catalog;
 import com.jht.nvntry.catalog.model.Product;
 import com.jht.nvntry.catalog.model.request.CreateProductRequest;
 import com.jht.nvntry.catalog.model.request.PatchProductRequest;
+import com.jht.nvntry.catalog.model.response.PagedProductResponse;
 import com.jht.nvntry.catalog.model.response.ProductResponse;
+import com.jht.nvntry.catalog.repository.ProductRepository;
+import com.jht.nvntry.catalog.service.CatalogService;
 import com.jht.nvntry.shared.exception.ConflictException;
 import com.jht.nvntry.shared.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -102,10 +105,10 @@ public class CatalogServiceTest {
 
             when(productRepository.findAllActive(pageable)).thenReturn(emptyPage);
 
-            Page<ProductResponse> result = catalogService.listActive(pageable);
+            PagedProductResponse result = catalogService.listActive(pageable);
 
-            assertThat(result.isEmpty()).isTrue();
-            assertThat(result.getTotalElements()).isEqualTo(0);
+            assertThat(result.content().isEmpty()).isTrue();
+            assertThat(result.content().size()).isEqualTo(0);
 
             verify(productRepository).findAllActive(pageable);
         }
@@ -119,11 +122,11 @@ public class CatalogServiceTest {
 
             when(productRepository.findAllActive(pageable)).thenReturn(productPage);
 
-            Page<ProductResponse> result = catalogService.listActive(pageable);
+            PagedProductResponse result = catalogService.listActive(pageable);
 
             assertThat(result).isNotNull();
-            assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent().getFirst().sku()).isEqualTo("SKU-1");
+            assertThat(result.content().size()).isEqualTo(1);
+            assertThat(result.content().getFirst().sku()).isEqualTo("SKU-1");
 
             verify(productRepository).findAllActive(pageable);
         }

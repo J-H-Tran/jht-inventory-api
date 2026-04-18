@@ -1,6 +1,7 @@
 package com.jht.nvntry.catalog;
 
 import com.jht.nvntry.catalog.model.Product;
+import com.jht.nvntry.catalog.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
