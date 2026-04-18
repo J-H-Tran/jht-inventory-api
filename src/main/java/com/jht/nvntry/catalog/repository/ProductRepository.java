@@ -1,4 +1,4 @@
-package com.jht.nvntry.catalog;
+package com.jht.nvntry.catalog.repository;
 
 import com.jht.nvntry.catalog.model.Product;
 import org.springframework.data.domain.Page;
